@@ -2,7 +2,8 @@
 import requests
 import json
 from math import ceil, floor
-from datetime import datetime, date, time, timedelta
+from datetime import datetime, date, timedelta
+import time
 from collections import namedtuple
 
 post = namedtuple('post', ['id', 'author', 'title', 'url', 'img', 'created'])
@@ -16,17 +17,24 @@ def unix_time(date_time):
 
 def get_posts(subreddit, before_str, after_str, count):
     """Returns a list of reponses from the Pushshift.io API"""
-    request_string = 'https://api.pushshift.io/reddit/search/submission?subreddit={}&before={}&after={}&size=25'
-    request_string = request_string.format(subreddit, unix_time(before_str), unix_time(after_str))
-    response = requests.get(request_string)
-    assert response.status_code == 200
-    return json.loads(response.content)
+    response_list = []
+    while not response_list:
+        request_string = 'https://api.pushshift.io/reddit/search/submission?subreddit={}&before={}&after={}&size=25'
+        request_string = request_string.format(subreddit, unix_time(before_str), unix_time(after_str))
+        response = requests.get(request_string)
+        assert response.status_code == 200
+        response_list = json.loads(response.content)['data']
+        if response_list:
+            return response_list
+        else:
+            time.sleep(2)
+    return ['Error']
 
 rs = get_posts('FoodPorn', '11/01/2019 00:00:00','01/01/2018 00:00:00', 25)
 
 
 l_data = []
-for p in rs['data']:
+for p in rs:
     l_data.append(post(p['id'], p['author'], p['title'], p['permalink'], p['url'], p['created_utc']))
 l_data
 
