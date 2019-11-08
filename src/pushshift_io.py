@@ -4,23 +4,26 @@ import json
 from math import ceil, floor
 from datetime import datetime, date, timedelta
 import time
+import pickle
 from collections import namedtuple
+import pandas as pd
 
 post = namedtuple('post', ['id', 'author', 'title', 'url', 'img', 'created'])
-post('123', 'Jim', 'Stuff and things', 'here', 'there', 'today')
+pt = post('123', 'Jim', 'Stuff and things', 'here', 'there', 'today')
+pt[0]
 
 # Function to convert a timestamp to a unix timestamp
 def unix_time(date_time):
-    epoch = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0)
+    # epoch = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0)
     # return int((datetime.strptime(date_time, '%m/%d/%Y %H:%M:%S') - epoch).total_seconds())
     return floor((datetime.strptime(date_time, '%m/%d/%Y %H:%M:%S')).timestamp())
 
-def get_posts(subreddit, before_str, after_str, count):
+def get_posts(subreddit, before, after, count):
     """Returns a list of reponses from the Pushshift.io API"""
     response_list = []
     while not response_list:
-        request_string = 'https://api.pushshift.io/reddit/search/submission?subreddit={}&before={}&after={}&size=25'
-        request_string = request_string.format(subreddit, unix_time(before_str), unix_time(after_str))
+        request_string = 'https://api.pushshift.io/reddit/search/submission?subreddit={}&before={}&after={}&size={}'
+        request_string = request_string.format(subreddit, before, after, count)
         response = requests.get(request_string)
         assert response.status_code == 200
         response_list = json.loads(response.content)['data']
@@ -30,40 +33,50 @@ def get_posts(subreddit, before_str, after_str, count):
             time.sleep(2)
     return ['Error']
 
-rs = get_posts('FoodPorn', '11/01/2019 00:00:00','01/01/2018 00:00:00', 25)
+
+rs = get_posts('FoodPorn', unix_time('11/01/2019 00:00:00'), unix_time('01/01/2018 00:00:00'), 25)
 
 
 l_data = []
-for p in rs:
-    l_data.append(post(p['id'], p['author'], p['title'], p['permalink'], p['url'], p['created_utc']))
-l_data
+keep_going = True
+last_post = -1
+start = unix_time('01/01/2018 00:00:00')
+stop = unix_time('11/01/2019 00:00:00')
+while keep_going:
+    rs = get_posts('FoodPorn', stop, start, 100)
+    for p in rs:
+        l_data.append(post(p['id'], p['author'], p['title'], p['permalink'], p['url'], p['created_utc']))
+    if len(rs) < 25:
+        keep_going = False
+    elif len(l_data) % 1000 == 0:
+        with open('../data/raw/posts.pkl', 'wb') as f:
+            pickle.dump(l_data, f)
+    else:
+        start = rs[-1]['created_utc'] + 1
+        print('Entries so far:', len(l_data))
 
-(datetime.now().timestamp())
-# timestamp 1572591600
-# minus epoch 1572566400
+l_data[-1]
 
-datetime.fromtimestamp(unix_time('11/01/2019 00:00:00'))
+!pwd
+datetime.fromtimestamp(1572590667)
 
-datetime(year=2019, month=1, day=1) - timedelta(seconds=1)
+with open('../data/raw/posts.pkl', 'wb') as f:
+    pickle.dump(l_data, f)
 
-unix_time('11/01/2019 00:00:00')
 
-before = unix_time('01/01/2018 00:00:00')
-before
+l_data[-10:]
 
-after = unix_time('01/01/2019 00:00:00')
-after
-before = unix_time('11/05/2019 00:00:00')
+def make_frame(data):
+    columns = ('id', 'author', 'title', 'url', 'img', 'created')
+    data_dict = {'id': [], 'author': [], 'title': [], 'url': [], 'img': [], 'created': []}
+    for item in data:
+        for idx, name in enumerate(columns):
+            data_dict[name].append(item[idx])
+    return pd.DataFrame(data_dict)
 
-subreddit = 'FoodPorn'
+posts_df = make_frame(l_data)
+posts_df.head()
+posts_df.shape
+posts_df.to_csv('../data/interim/fp_posts.csv', index=False)
 
-request_string = 'https://api.pushshift.io/reddit/search/submission?subreddit={}&before={}&after={}&size=25'
-
-request_string
-request_string = request_string.format(subreddit, before, after)
-request_string
-r = requests.get(request_string)
-r
-response_json = json.loads(r.content)
-type(response_json)
-response_json['data']
+posts_df.head(10)
