@@ -23,14 +23,18 @@ def top_n_similar(n, X, sample_str, vectorizer):
     # return cosine_similarity(X.components_, Y_tf)
     return list(sims_and_idx)[:n]
 
-def make_result_frame(similarities, model):
-    indexes = []
-    sims = []
-    for item in similarities:
-        indexes.append(item[1])
-        sims.append(item[0][0])
-    frame = pd.DataFrame(sims, index=indexes, columns=['cosine_similarity'])
-    return frame
+# def make_result_frame(similarities, model):
+#     indexes = []
+#     sims = []
+#     for item in similarities:
+#         indexes.append(item[1])
+#         sims.append(item[0][0])
+#     frame = pd.DataFrame(sims, index=indexes, columns=['cosine_similarity'])
+#     return frame
+
+def make_result_frame(sims_and_idx, model):
+    return pd.DataFrame([np.concatenate((x[0], lsa.components_[x[1]]), axis=0) for x in sims],
+                 columns=['cosine_similarity'] + tf.get_feature_names())
 
 
 sims = top_n_similar(3, lsa, 'ckicken pot pie with asparugus spears', tf)
@@ -38,9 +42,4 @@ sims
 
 make_result_frame(sims, lsa)
 
-pd.DataFrame([np.concatenate((x[0], lsa.components_[x[1]]), axis=0) for x in sims],
-             columns=['cosine_similarity'] + tf.get_feature_names())
-[lsa.components_[x[1]] for x in sims]
-[x[1] for x in sims]
-
-np.concatenate((np.array([1,2,3]), np.array([4,5,6])), axis=0)
+lsa.components_
