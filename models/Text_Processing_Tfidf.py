@@ -47,7 +47,7 @@ del fp
 tf.get_feature_names()[:20]
 
 print('Entering LSA step...')
-lsa = TruncatedSVD(n_components=50)
+lsa = TruncatedSVD(n_components=100)
 word_vec_reduced = lsa.fit_transform(wv.toarray())
 
 print('Pickling TfidfVectorizer...')
@@ -72,15 +72,11 @@ with open('lsa.pkl', 'rb') as f:
     lsa = pickle.load(f)
 
 terms = tf.get_feature_names()
-
-
-len(lsa.components_)
-
 with open('notes.txt', 'w') as notes:
     for idx, comp in enumerate(lsa.components_):
         terms_in_components = zip(terms, comp)
         sorted_terms = sorted(terms_in_components, key=lambda x: x[1], reverse=True)
         notes.write('Topic {}\n:'.format(idx))
-        for i, term in enumerate(sorted_terms):
+        for i, term in enumerate(sorted_terms[:10]):
             notes.write('{} '.format(term[0]))
         notes.write('\n')
