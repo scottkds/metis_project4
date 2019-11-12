@@ -45,12 +45,12 @@ def run_models(data, vectorizers, models, n_topics, tokenizer, vocabulary):
     models and number of topics."""
     for vkey, vectorizer in vectorizers.items():
         vec = vectorizer(tokenizer=tokenizer, stop_words='english', ngram_range=(1,2))
-        word_vec = vec.fit_transform(data)
-        print(word_vec.shape)
+        vectorizer_fit = vec.fit_transform(data)
         for mkey, model in models.items():
             for n in n_topics:
                 model_instance = model(n_components=n)
-                word_vector = model_instance.fit_transform(word_vec)
+                word_vector = model_instance.fit_transform(vectorizer_fit)
+                print('Shape of topics vector:', word_vector.shape)
                 print('notes/output_file_{}_{}_{}.txt'.format(vkey,mkey, n))
                 if mkey == 'LSA':
                     print(model_instance.components_)
@@ -77,7 +77,7 @@ def run_models(data, vectorizers, models, n_topics, tokenizer, vocabulary):
 
                 print('Pickling document topic object...')
                 with open('pickles/doc_topic_{}_{}_{}.pkl'.format(vkey,mkey, n), 'wb') as f:
-                    pickle.dump(word_vec, f)
+                    pickle.dump(word_vector, f)
     return 0
 
 if __name__ == '__main__':
@@ -86,6 +86,9 @@ if __name__ == '__main__':
     fp = pd.read_csv('~/p4/data/interim/fp_posts.csv')
     fp = fp.drop(['url', 'img', 'created'], axis=1)
     fp['before'] = fp['title'].copy()
+    fp['title'] = fp.title.str.replace(r'\d+', '')
+    fp['title'] = fp.title.str.replace(r'\[.*\]', '')
+    fp['title'] = fp.title.str.replace(r'[^A-Za-z\s]', '')
 
     # Create a vocabulary. The vocabulary filters out extremes values so that
     # only words that appear more than a set number of times are included.
