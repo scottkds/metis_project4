@@ -111,4 +111,6 @@ if __name__ == '__main__':
 
     top_n_similar(test_strings[1], 5, word_vec_reduced, nmf, tf)
 
-docs.loc[18180]
+    with open('/Users/scott/p4/pickles/tokenize.pkl', 'wb') as f:
+        VOCABULARY = pickle.dump(tokenize, f)
+
