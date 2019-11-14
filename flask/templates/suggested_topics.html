@@ -1,0 +1,13 @@
+<html>
+<head>
+<title>success</title>
+</head>
+<body>
+
+<p><h2>API Page: Suggested Topics</h2></p>
+  {% for i in range(num_topics) %}
+  <p><a href="{{ threads[i] }}">{{ threads[i] }}</a></p>
+  {% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Food Ads 5000!</title>
+    <!-- Bootstrap core CSS -->
+    <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="{{ url_for('static', filename='offcanvas.css') }}" rel="stylesheet">
+</head>
+<html>
+   <body>
+       <h3>Food Ads 5000!</h3><br>
+       <h4>Input a food related string:</h4>
+      <form action = "/query" method = "POST">
+         <p>
+            <textarea name="query" rows="10" cols="50"></textarea>
+            <input type="submit" value="OK">
+         </p>
+         </form>
+         <h4>Input a food related string:</h4>
+        <form action = "/api" method = "GET">
+           <p>
+              <textarea name="api_query" rows="10" cols="50"></textarea>
+              <input type="submit" value="OK">
+           </p>
+       </form>
+       <!--
+       <form action = "/search" method = "POST">
+         <p>Search <input type = "text" name = "search" />
+         <input type="submit" value="OK"></p>
+       </form>-->
+   </body>
+</html>

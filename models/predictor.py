@@ -33,6 +33,24 @@ def top_topic(vectorizer, model, new_document):
     topics = nmf.transform(word_vec)
     return np.argmax(topics)
 
+# def top_n_similar(sample_str, n, topic_vector, model, vectorizer):
+#     """Returns the top n similar posts to the subreddit forum
+#     Inputs:
+#         n -> number of posts to return
+#         topic_vector -> the topic vector to compare cosine cosine_similarity
+#         sample_str -> the input string
+#         vectorizer -> the vectorizer used to vectorize the input string
+#     Output:
+#         numpy array of cosine similarities"""
+#     Y_tf = vectorizer.transform([sample_str])
+#     Y_nmf = nmf.transform(Y_tf)
+#     print(Y_nmf.shape)
+#     sims = cosine_similarity(topic_vector, Y_nmf)
+#     sort_order = np.argsort(sims.reshape(sims.shape[0]))[::-1]
+#     sims_and_idx = zip(sims[sort_order], sort_order)
+#     # return cosine_similarity(X.components_, Y_tf)
+#     return list(sims_and_idx)[:n]
+
 def top_n_similar(sample_str, n, topic_vector, model, vectorizer):
     """Returns the top n similar posts to the subreddit forum
     Inputs:
@@ -49,7 +67,8 @@ def top_n_similar(sample_str, n, topic_vector, model, vectorizer):
     sort_order = np.argsort(sims.reshape(sims.shape[0]))[::-1]
     sims_and_idx = zip(sims[sort_order], sort_order)
     # return cosine_similarity(X.components_, Y_tf)
-    return list(sims_and_idx)[:n]
+    # return list(sims_and_idx)[:n]
+    return [x for x in sort_order[:n]]
 
 def load_pickles():
     """Loads pickled objects from previous text analisys."""

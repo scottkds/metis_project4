@@ -1,0 +1,23 @@
+<html>
+<head>
+<title>success</title>
+</head>
+<body>
+<p><h2>Search Results</h2></p>
+<p>Results:</p>
+<table>
+  <tr>
+    {% for name in search_string[0]: %}
+      <td>{{ name }}</td>
+    {%endfor%}
+  </tr>
+  {% for row in search_string[1]: %}
+    <tr>
+      {% for item in row: %}
+        <td>{{ item }}</td>
+      {%endfor%}
+    </tr>
+  {%endfor%}
+</table>
+</body>
+</html>
