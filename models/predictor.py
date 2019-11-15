@@ -85,14 +85,14 @@ def load_pickles():
     with open('/Users/scott/p4/pickles/model_tfidf_NMF_20.pkl', 'rb') as f:
         nmf = pickle.load(f)
 
-    with open('/Users/scott/p4/pickles/km.pkl', 'rb') as f:
-        km = pickle.load(f)
+#   with open('/Users/scott/p4/pickles/km.pkl', 'rb') as f:
+#       km = pickle.load(f)
 
-    return (VOCABULARY, tf, word_vec_reduced, nmf, km)
+    return (VOCABULARY, tf, word_vec_reduced, nmf)
 
 if __name__ == '__main__':
 
-    VOCABULARY, tf, word_vec_reduced, nmf, km = load_pickles()
+    VOCABULARY, tf, word_vec_reduced, nmf = load_pickles()
 
     test_strings = ['bbq brisket and coleslaw',
                     'sausage eggs and hashbrowns',

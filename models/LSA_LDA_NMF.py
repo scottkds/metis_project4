@@ -38,13 +38,13 @@ def tokenize(string):
     """Cleans and tokenizes a string and returns a list of strings that are in
     VOCABULARY"""
     words_in_string = clean_str(string)
-    return [word for word in words_in_string if word in VOCABULARY]
+    return ' '.join([word for word in words_in_string if word in VOCABULARY])
 
 def run_models(data, vectorizers, models, n_topics, tokenizer, vocabulary):
     """Provides a pipeline functionality in order to frun multiple vectorizers,
     models and number of topics."""
     for vkey, vectorizer in vectorizers.items():
-        vec = vectorizer(tokenizer=tokenizer, stop_words='english', ngram_range=(1,2))
+        vec = vectorizer(stop_words='english', ngram_range=(1,2))
         vectorizer_fit = vec.fit_transform(data)
         for mkey, model in models.items():
             for n in n_topics:
@@ -95,7 +95,7 @@ if __name__ == '__main__':
     VOCABULARY = create_vocabulary(fp.title, min_count=20)
     with open('pickles/vocabulary.pkl', 'wb') as f:
         pickle.dump(VOCABULARY, f)
-
+    fp.title = fp.apply(lambda row: tokenize(row['title']),axis=1)
     # Set up test parameters and run models.
     # test_vecs = {'cv': CountVectorizer, 'tfidf': TfidfVectorizer}
     test_vecs = {'tfidf': TfidfVectorizer}
